@@ -28,5 +28,4 @@ jobs:
           docker buildx build --push \
             -f Dockerfile \
             --tag ${{ github.repository}}:${{ matrix.platform }} \
-            --platform ${{ matrix.platform }}
-
+            --platform ${{ matrix.platform }} .
