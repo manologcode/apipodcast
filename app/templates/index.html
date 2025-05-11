@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podcast List</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Optional: Add some custom styles if needed */
+    </style>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold mb-6 text-gray-800">Available Podcasts</h1>
+
+        {% if podcasts %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for podcast in podcasts %}
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        {% if podcast.image_url %}
+                            <img src="{{ url_for('static', path=podcast.image_url) }}" alt="{{ podcast.title }} Cover" class="w-full h-48 object-cover">
+                        {% else %}
+                            <div class="w-full h-48 bg-gray-300 flex items-center justify-center text-gray-600">No Image</div>
+                        {% endif %}
+                        <div class="p-6">
+                        <a href="{{ url_for('read_podcast_detail', feed_url_slug=podcast.feed_url_slug) }}" class="block hover:bg-gray-50">
+                            <h2 class="text-xl font-semibold mb-2 text-gray-800">{{ podcast.title }}</h2>
+                            <p class="text-gray-600 text-sm mb-4">{{ podcast.description }}</p>
+                            <p class="text-gray-700 text-sm mb-2">Author: {{ podcast.author }}</p>
+                            <p class="text-gray-700 text-sm mb-4">Language: {{ podcast.language }}</p>
+                        </a>
+                        <a href="{{ url_for('get_podcast_feed', feed_url_slug=podcast.feed_url_slug) }}" class="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm mt-2">
+                            RSS Feed
+                        </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-gray-600">No podcasts available yet.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
