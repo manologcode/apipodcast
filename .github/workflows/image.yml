@@ -25,7 +25,8 @@ jobs:
       - name: build the image for ${{ matrix.platform }}
         continue-on-error: true
         run: |
+          PLATFORM_TAG=$(echo "${{ matrix.platform }}" | tr '/' '-')
           docker buildx build --push \
             -f Dockerfile \
-            --tag ${{ github.repository}}:${{ matrix.platform }} \
+            --tag ${{ github.repository }}:${PLATFORM_TAG} \
             --platform ${{ matrix.platform }} .
