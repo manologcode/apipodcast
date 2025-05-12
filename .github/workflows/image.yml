@@ -28,5 +28,5 @@ jobs:
           PLATFORM_TAG=$(echo "${{ matrix.platform }}" | tr '/' '-')
           docker buildx build --push \
             -f Dockerfile \
-            --tag ${{ github.repository }}:${PLATFORM_TAG} \
+            --tag ${{ github.repository }}:latest \
             --platform ${{ matrix.platform }} .

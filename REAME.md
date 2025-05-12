@@ -42,5 +42,7 @@ services:
         - "5002:5000"
     volumes:
         - ./files:/app/static/files
+        - podcast.db:/app/podcast.db
     environment:
       - API_TOKEN=your_super_secret_token # <-- REPLACE WITH A STRONG, UNIQUE TOKEN
+      - BASE_URL=http://localhost:5002
