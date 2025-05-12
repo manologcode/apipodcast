@@ -24,17 +24,16 @@ import feed_generator
 # Asegúrate de que existan
 BASE_DIR = Path(__file__).parent
 STATIC_DIR = BASE_DIR / "static"
-IMAGES_DIR = STATIC_DIR / "files/images"
-AUDIO_DIR = STATIC_DIR / "files/audio"
+FILES_DIR = STATIC_DIR / "files"
 TEMPLATES_DIR = BASE_DIR / "templates" # Define templates directory
 
 # Crear directorios si no existen
-for _dir in [STATIC_DIR, IMAGES_DIR, AUDIO_DIR, TEMPLATES_DIR]: # Include templates directory
+for _dir in [STATIC_DIR, FILES_DIR, TEMPLATES_DIR]: # Include templates directory
     _dir.mkdir(parents=True, exist_ok=True)
 
 # Configuración de la base URL (importante para generar URLs completas en el feed y API)
 # Deberías cambiar esto a la URL pública de tu aplicación
-BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
+BASE_URL = os.getenv("BASE_URL", "http://localhost:5002")
 
 # Configurar Jinja2Templates
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
@@ -141,7 +140,7 @@ async def create_podcast(
         raise HTTPException(status_code=400, detail="Podcast with this feed slug already exists")
 
     # Guardar la imagen subida
-    image_relative_path = await save_upload_file(image_file, IMAGES_DIR)
+    image_relative_path = await save_upload_file(image_file, FILES_DIR)
 
     podcast_create_schema = schemas.PodcastCreate(
         title=title,
@@ -194,7 +193,7 @@ async def update_podcast(
         # Opcional: Eliminar la imagen antigua si existe
         if db_podcast.image_url and (STATIC_DIR / db_podcast.image_url).exists():
             os.remove(STATIC_DIR / db_podcast.image_url)
-        image_relative_path = await save_upload_file(image_file, IMAGES_DIR)
+        image_relative_path = await save_upload_file(image_file, FILES_DIR)
 
     # Crear un schema de actualización solo con los campos proporcionados
     update_data = {
@@ -246,7 +245,7 @@ async def create_episode_for_podcast(
         raise HTTPException(status_code=404, detail="Podcast not found")
 
     # Guardar el archivo de audio
-    audio_relative_path = await save_upload_file(audio_file, AUDIO_DIR)
+    audio_relative_path = await save_upload_file(audio_file, FILES_DIR)
 
     # Obtener información del archivo
     audio_length = get_file_size(audio_relative_path)
@@ -318,7 +317,7 @@ async def update_episode(
         if db_episode.audio_url and (STATIC_DIR / db_episode.audio_url).exists():
             os.remove(STATIC_DIR / db_episode.audio_url)
 
-        audio_relative_path = await save_upload_file(audio_file, AUDIO_DIR)
+        audio_relative_path = await save_upload_file(audio_file, FILES_DIR)
         audio_length = get_file_size(audio_relative_path)
         audio_type = get_mime_type(audio_relative_path)
         # Recalcular duración si se sube un nuevo archivo y no se proporciona duración explícitamente
@@ -383,7 +382,7 @@ def get_podcast_feed(feed_url_slug: str, request: Request, db: Session = Depends
 
 # --- Endpoint para Detalles del Podcast y Episodios ---
 
-@app.get("/podcasts/{feed_url_slug}/", response_class=HTMLResponse)
+@app.get("/{feed_url_slug}", response_class=HTMLResponse)
 def read_podcast_detail(feed_url_slug: str, request: Request, db: Session = Depends(database.get_db)):
     """
     Displays details of a specific podcast and its episodes.

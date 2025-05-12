@@ -20,7 +20,7 @@ def generate_rss_feed(podcast: models.Podcast, episodes: List[models.Episode], b
     ET.SubElement(channel, "title").text = podcast.title
     # La URL del link debe ser la URL del sitio web asociado al podcast,
     # no necesariamente la del feed. Usamos la base_url por simplicidad.
-    ET.SubElement(channel, "link").text = base_url
+    ET.SubElement(channel, "link").text = f"{base_url}/{podcast.feed_url_slug}"
     ET.SubElement(channel, "description").text = podcast.description
     ET.SubElement(channel, "language").text = podcast.language
     ET.SubElement(channel, "lastBuildDate").text = formatdate(usegmt=True)
@@ -31,7 +31,7 @@ def generate_rss_feed(podcast: models.Podcast, episodes: List[models.Episode], b
          # Puedes necesitar tags <itunes:category> anidados para subcategorías
         ET.SubElement(channel, "{http://www.itunes.com/dtds/podcast-1.0.dtd}category", text=podcast.category)
     if podcast.image_url:
-        full_image_url = f"{base_url}/static/images/{podcast.image_url.split('/')[-1]}" # Asumimos que image_url es una ruta relativa dentro de static/images
+        full_image_url = f"{base_url}/static/files/{podcast.image_url.split('/')[-1]}" # Asumimos que image_url es una ruta relativa dentro de static/files
         ET.SubElement(channel, "{http://www.itunes.com/dtds/podcast-1.0.dtd}image", href=full_image_url)
         # También puedes incluir una etiqueta <image> estándar de RSS si lo deseas
         # img = ET.SubElement(channel, "image")
@@ -47,7 +47,7 @@ def generate_rss_feed(podcast: models.Podcast, episodes: List[models.Episode], b
         ET.SubElement(item, "pubDate").text = formatdate(episode.pub_date.timestamp(), usegmt=True)
 
         # Tag <enclosure> es crucial para podcasts
-        full_audio_url = f"{base_url}/static/audio/{episode.audio_url.split('/')[-1]}" # Asumimos que audio_url es una ruta relativa dentro de static/audio
+        full_audio_url = f"{base_url}/static/files/{episode.audio_url.split('/')[-1]}" # Asumimos que audio_url es una ruta relativa dentro de static/files
         ET.SubElement(item, "enclosure",
                      url=full_audio_url,
                      length=str(episode.audio_length),

@@ -5,10 +5,11 @@ services:
     image: manologcode/api-podcast
     restart: always
     container_name: apipodcast
-    command: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000"]
+    command: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]
     ports:
         - "5002:5000"
     volumes:
         - ./app:/app
     environment:
       - API_TOKEN=your_super_secret_token # <-- REPLACE WITH A STRONG, UNIQUE TOKEN
+      - BASE_URL=http://localhost:5002

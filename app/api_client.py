@@ -1,7 +1,7 @@
 import requests
 import os
 
-BASE_URL = "http://localhost:5000" # Replace with your application's base URL (using the exposed port)
+BASE_URL =  os.getenv("BASE_URL", "http://localhost:5002") 
 
 def create_podcast(token: str, title: str, description: str, author: str, feed_url_slug: str, image_filepath: str, language: str = "es", category: str = None):
     """

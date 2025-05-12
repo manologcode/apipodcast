@@ -1,2 +1,2 @@
-docker-compose-pro.yml
-production_deploy.sh
+app/app/podcast.db
+app/static/files
