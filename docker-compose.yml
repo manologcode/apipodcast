@@ -2,7 +2,7 @@ version: "3.1"
 services:
   app:
     build: .
-    image: manologcode/api-podcast
+    image: manologcode/apipodcast
     restart: always
     container_name: apipodcast
     # command: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]

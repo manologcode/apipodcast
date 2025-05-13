@@ -22,5 +22,5 @@ USER myuser
 # Copy the application code after installing dependencies
 COPY --chown=myuser:myuser ./app /app/
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000"]
 

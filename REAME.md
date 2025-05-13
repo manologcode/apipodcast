@@ -32,7 +32,7 @@ crear el archivo de docker compose con el siguente contencido cambiando el valor
 ```bash
 services:
   app:
-    image: manologcode/apipodcastapipodcast:linux-amd64
+    image: manologcode/apipodcast:linux-amd64
 
     restart: always
     container_name: apipodcast
