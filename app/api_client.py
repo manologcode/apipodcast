@@ -84,6 +84,56 @@ def create_episode(token: str, podcast_id: int, title: str, description: str, au
     finally:
         files['audio_file'].close() # Close the file after sending
 
+def update_podcast(token: str, podcast_id: int, title: str = None, description: str = None, author: str = None, image_filepath: str = None, language: str = None, category: str = None):
+    """
+    Updates an existing podcast by sending a PUT request to the API.
+
+    Args:
+        token: The API token for authentication.
+        podcast_id: The ID of the podcast to update.
+        title: The new title of the podcast (optional).
+        description: The new description of the podcast (optional).
+        author: The new author of the podcast (optional).
+        image_filepath: The path to the new podcast cover image file (optional).
+        language: The new language of the podcast (optional).
+        category: The new category of the podcast (optional).
+
+    Returns:
+        A dictionary containing the updated podcast data if successful, None otherwise.
+    """
+    url = f"{BASE_URL}/podcasts/{podcast_id}"
+    files = {}
+    data = {}
+
+    if title:
+        data['title'] = title
+    if description:
+        data['description'] = description
+    if author:
+        data['author'] = author
+    if language:
+        data['language'] = language
+    if category:
+        data['category'] = category
+    if image_filepath:
+        files['image_file'] = open(image_filepath, 'rb')
+
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+
+    try:
+        response = requests.put(url, files=files, data=data, headers=headers)
+        response.raise_for_status() # Raise an exception for bad status codes
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error updating podcast: {e}")
+        return None
+    finally:
+        if 'image_file' in files:
+            files['image_file'].close() # Close the file after sending
+
+
 if __name__ == '__main__':
     # Example Usage (replace with actual data and file paths)
 

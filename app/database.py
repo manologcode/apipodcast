@@ -4,7 +4,7 @@ from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import sessionmaker
 
 # URL de la base de datos SQLite
-SQLALCHEMY_DATABASE_URL = "sqlite:///./podcast.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:////app/data/podcast.db"
 
 # Crear un motor de base de datos
 # connect_args={"check_same_thread": False} es necesario para SQLite en FastAPI

@@ -20,29 +20,28 @@ Una aplicación web para publicar y alojar episodios de podcast de forma automá
 
 ## 📦 Instalación rápida (con Docker)
 
+existen docker para: linux/amd64, linux/arm64, linux/arm/v7
+
+crear los directorios files y data
+
 ```bash
-# Clona el repositorio
-git clone https://github.com/<tu-usuario>/<nombre-del-repo>.git
-cd <nombre-del-repo>
-
-# Copia el archivo de entorno si existe
-cp .env.example .env
-
-# Construye y levanta los contenedores
-docker compose up --build
-
+mkdir data files
 ```
+crear el archivo de docker compose con el siguente contencido cambiando el valor de las variable
 
+```bash
 services:
   app:
-    image: manologcode/api-podcast
+    image: manologcode/apipodcastapipodcast:linux-amd64
+
     restart: always
     container_name: apipodcast
     ports:
         - "5002:5000"
     volumes:
         - ./files:/app/static/files
-        - podcast.db:/app/podcast.db
+        - ./data:/app/data
     environment:
-      - API_TOKEN=your_super_secret_token # <-- REPLACE WITH A STRONG, UNIQUE TOKEN
+      - API_TOKEN=your_super_secret_token 
       - BASE_URL=http://localhost:5002
+```

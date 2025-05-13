@@ -19,6 +19,7 @@ import models
 import schemas
 import database
 import feed_generator
+from audio_util import duration_mp3
 
 # Directorios para guardar archivos subidos
 # Asegúrate de que existan
@@ -252,22 +253,16 @@ async def create_episode_for_podcast(
     audio_type = get_mime_type(audio_relative_path)
 
     # Si no se proporciona duración, intenta calcularla (requiere mutagen u otra lib)
-    # duration_str = duration
-    # if not duration_str:
-    #    duration_seconds = get_audio_duration(audio_relative_path)
-    #    if duration_seconds is not None:
-    #        # Convertir segundos a HH:MM:SS (ejemplo simple)
-    #        hours, remainder = divmod(int(duration_seconds), 3600)
-    #        minutes, seconds = divmod(remainder, 60)
-    #        duration_str = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
-
+    duration_str = duration
+    if not duration_str:
+       full_path = STATIC_DIR / audio_relative_path
+       duration_str = duration_mp3(full_path)
 
     episode_create_schema = schemas.EpisodeCreate(
         title=title,
         description=description,
-        # duration=duration_str # Usar la duración proporcionada o calculada
+        duration=duration_str # Usar la duración proporcionada o calculada
     )
-
 
     return crud.create_episode(
         db=db,
@@ -276,7 +271,7 @@ async def create_episode_for_podcast(
         audio_url=audio_relative_path,
         audio_length=audio_length,
         audio_type=audio_type,
-        duration=duration # Pasamos la duración proporcionada por el usuario
+        duration=duration_str 
     )
 
 @app.get("/podcasts/{podcast_id}/episodes/", response_model=List[schemas.Episode])
