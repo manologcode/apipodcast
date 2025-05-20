@@ -289,6 +289,20 @@ def read_episode(episode_id: int, db: Session = Depends(database.get_db)):
         raise HTTPException(status_code=404, detail="Episode not found")
     return db_episode
 
+@app.get("/episode/{episode_id}", response_class=HTMLResponse, name="read_episode_detail")
+def read_episode_detail(episode_id: int, request: Request, db: Session = Depends(database.get_db)):
+    """
+    Displays details of a specific episode.
+    """
+    db_episode = crud.get_episode(db, episode_id=episode_id)
+    if db_episode is None:
+        raise HTTPException(status_code=404, detail="Episode not found")
+
+    # You might also want to fetch the parent podcast details to link back
+    db_podcast = crud.get_podcast(db, podcast_id=db_episode.podcast_id)
+
+    return templates.TemplateResponse("episode_detail.html", {"request": request, "episode": db_episode, "podcast": db_podcast})
+
 
 @app.put("/episodes/{episode_id}", response_model=schemas.Episode, dependencies=[Depends(verify_token)]) # Apply security dependency
 async def update_episode(

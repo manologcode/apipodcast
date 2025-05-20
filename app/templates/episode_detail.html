@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ podcast.title }} - Capítulos</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Optional: Add some custom styles if needed */
+    </style>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+    <div class="container mx-auto p-4">
+        <div class="flex items-center mb-6">
+                {% if podcast.image_url %}
+                    <div class="md:flex-shrink-0">
+                        <img src="{{ url_for('static', path=podcast.image_url) }}" alt="{{ podcast.title }} Cover" class="w-full md:w-48 object-cover">
+                    </div>
+                {% endif %}
+            <h1 class="text-3xl font-bold text-gray-800">{{ podcast.title }}</h1>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">{{ episode.title }}</h2>
+
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <p class="text-gray-600 text-sm mb-4">{{ episode.description  | safe }}</p>
+            {% if episode.duration %}
+                <p class="text-gray-700 text-sm mb-2">Duration: {{ episode.duration }} - <small>{{ episode.id }}</small></p>
+            {% endif %}
+            <p class="text-gray-700 text-sm mb-4">Published: {{ episode.pub_date.strftime('%Y-%m-%d %H:%M') }}</p>
+            {% if episode.audio_url %}
+                <audio controls class="w-full">
+                    <source src="{{ url_for('static', path=episode.audio_url) }}" type="{{ episode.audio_type }}">
+                    Your browser does not support the audio element.
+                </audio>
+            {% endif %}
+        </div>
+
+        <a href="{{ url_for('read_podcast_detail', feed_url_slug=podcast.feed_url_slug) }}" class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded text-sm">
+            &larr; Back to Podcast
+        </a>
+
+    </div>
+</body>
+</html>
