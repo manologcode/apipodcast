@@ -27,7 +27,7 @@ crear los directorios files y data
 ```bash
 mkdir data files
 ```
-crear el archivo de docker compose con el siguente contencido cambiando el valor de las variable
+crear el archivo de docker compose con el siguiente contenido cambiando el valor de las variable
 
 ```bash
 services:
@@ -44,4 +44,6 @@ services:
     environment:
       - API_TOKEN=your_super_secret_token 
       - BASE_URL=http://localhost:5002
+      - TITLE_PODCAST=Podcasts 
+      - SUBTITLE_PODCAST=Ideas hechas voz 
 ```

@@ -35,6 +35,8 @@ for _dir in [STATIC_DIR, FILES_DIR, TEMPLATES_DIR]: # Include templates director
 # Configuración de la base URL (importante para generar URLs completas en el feed y API)
 # Deberías cambiar esto a la URL pública de tu aplicación
 BASE_URL = os.getenv("BASE_URL", "http://localhost:5002")
+TITLE_PODCAST = os.getenv("TITLE_PODCAST", "Podcasts")
+SUBTITLE_PODCAST = os.getenv("SUBTITLE_PODCAST", "Tus historias en voz")
 
 # Configurar Jinja2Templates
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
@@ -118,8 +120,9 @@ def read_root(request: Request, db: Session = Depends(database.get_db)):
     """
     Displays a list of available podcasts.
     """
+    data={'title': TITLE_PODCAST, 'subtitle': SUBTITLE_PODCAST}
     podcasts = crud.get_podcasts(db)
-    return templates.TemplateResponse("index.html", {"request": request, "podcasts": podcasts})
+    return templates.TemplateResponse("index.html", {"request": request, "podcasts": podcasts, "data":data})
 
 
 # --- Endpoints para Podcasts ---

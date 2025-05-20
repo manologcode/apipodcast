@@ -3,43 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Podcast List</title>
+    <title>Lista de Podcasts</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Optional: Add some custom styles if needed */
-    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
 </head>
-<body class="bg-gray-100 font-sans leading-normal tracking-normal">
-    <div class="container mx-auto p-4">
-        <h1 class="text-3xl font-bold mb-6 text-gray-800">Available Podcasts</h1>
+<body class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <!-- Animated Header -->
+    <div class="gradient-bg relative overflow-hidden">
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="1"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+        <div class="container mx-auto px-4 py-20 relative z-10">
+            <div class="text-center text-white">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-white/10 rounded-full mb-6 backdrop-blur-sm">
+                    <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.369 4.369 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/>
+                    </svg>
+                </div>
+                <h1 class="text-5xl md:text-6xl font-bold mb-4 tracking-tight">{{ data['title'] }}</h1>
+                <p class="text-xl text-white/80 mb-8 max-w-2xl mx-auto">{{ data['subtitle'] }}</p>
+                <div class="w-24 h-1 bg-white/30 mx-auto rounded-full"></div>
+            </div>
+        </div>
+    </div>
 
+    <div class="container mx-auto px-4 -mt-12 relative z-10">
         {% if podcasts %}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Stats Bar -->
+            <div class="glass-effect rounded-2xl p-6 mb-12 border border-white/20">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-brand-100 rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-brand-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800">{{ podcasts|length }} Podcasts Disponibles</h3>
+                            <p class="text-gray-600 text-sm">Listo para transmitir y descubrir</p>
+                        </div>
+                    </div>
+                    <div class="hidden md:flex items-center space-x-6 text-sm text-gray-600">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-green-400 rounded-full pulse-animation"></div>
+                            <span>Actualizaciones en Vivo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Podcast Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {% for podcast in podcasts %}
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                        {% if podcast.image_url %}
-                            <img src="{{ url_for('static', path=podcast.image_url) }}" alt="{{ podcast.title }} Cover" class="w-full h-48 object-cover">
-                        {% else %}
-                            <div class="w-full h-48 bg-gray-300 flex items-center justify-center text-gray-600">No Image</div>
-                        {% endif %}
+                    <div class="podcast-card bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg border border-white/20 overflow-hidden group">
+                        <!-- Image Section -->
+                        <div class="relative overflow-hidden h-56">
+                            {% if podcast.image_url %}
+                                <img src="{{ url_for('static', path=podcast.image_url) }}"
+                                     alt="{{ podcast.title }} Cover"
+                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                                <div class="absolute inset-0 image-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                    <div class="text-white text-center">
+                                        <svg class="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
+                                        </svg>
+                                        <span class="text-sm font-medium">Escuchar Ahora</span>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center group-hover:from-brand-50 group-hover:to-brand-100 transition-colors duration-300">
+                                    <div class="text-center text-gray-500 group-hover:text-brand-600 transition-colors duration-300">
+                                        <svg class="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.369 4.369 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/>
+                                        </svg>
+                                        <span class="text-sm font-medium">Podcast</span>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <!-- Language Badge -->
+                            <div class="absolute top-4 right-4">
+                                <span class="px-3 py-1 bg-white/90 backdrop-blur-sm text-gray-700 text-xs font-medium rounded-full border border-white/50">
+                                    {{ podcast.language.upper() }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Content Section -->
                         <div class="p-6">
-                        <a href="{{ url_for('read_podcast_detail', feed_url_slug=podcast.feed_url_slug) }}" class="block hover:bg-gray-50">
-                            <h2 class="text-xl font-semibold mb-2 text-gray-800">{{ podcast.title }}</h2>
-                            <p class="text-gray-600 text-sm mb-4">{{ podcast.description }}</p>
-                            <p class="text-gray-700 text-sm mb-2">Author: {{ podcast.author }}</p>
-                            <p class="text-gray-700 text-sm mb-4">Language: {{ podcast.language }}</p>
-                        </a>
-                        <a href="{{ url_for('get_podcast_feed', feed_url_slug=podcast.feed_url_slug) }}" class="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm mt-2">
-                            RSS Feed
-                        </a>
+                            <a href="{{ url_for('read_podcast_detail', feed_url_slug=podcast.feed_url_slug) }}" class="block group-hover:bg-transparent transition-colors duration-200">
+                                <h2 class="text-xl font-bold mb-3 text-gray-800 leading-tight group-hover:text-brand-700 transition-colors duration-200">
+                                    {{ podcast.title }}
+                                </h2>
+
+                                <p class="text-gray-600 text-sm mb-4 leading-relaxed line-clamp-3">
+                                    {{ podcast.description | truncate(120) }}
+                                </p>
+
+                                <!-- Author Info -->
+                                <div class="flex items-center space-x-2 mb-4">
+                                    <div class="w-8 h-8 bg-gradient-to-br from-brand-400 to-brand-600 rounded-full flex items-center justify-center">
+                                        <span class="text-white text-xs font-bold">{{ podcast.author[0].upper() if podcast.author else 'P' }}</span>
+                                    </div>
+                                    <span class="text-gray-700 text-sm font-medium">{{ podcast.author }}</span>
+                                </div>
+                            </a>
+
+                            <!-- Action Buttons -->
+                            <div class="flex items-center justify-between mt-6">
+                                <a href="{{ url_for('read_podcast_detail', feed_url_slug=podcast.feed_url_slug) }}"
+                                   class="flex-1 mr-3 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 text-center text-sm">
+                                    Ver Episodios
+                                </a>
+
+                                <a href="{{ url_for('get_podcast_feed', feed_url_slug=podcast.feed_url_slug) }}"
+                                   class="p-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors duration-200 group"
+                                   title="Feed RSS">
+                                    <svg class="w-5 h-5 text-gray-600 group-hover:text-brand-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M3.429 4.286A1 1 0 014.286 3h11.428a1 1 0 01.857 1.286l-1.714 10.285a1 1 0 01-.857.715H6a1 1 0 01-.857-.715L3.429 4.286z"/>
+                                    </svg>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 {% endfor %}
             </div>
+
         {% else %}
-            <p class="text-gray-600">No podcasts available yet.</p>
+            <!-- Empty State -->
+            <div class="text-center py-20">
+                <div class="glass-effect rounded-3xl p-12 max-w-md mx-auto">
+                    <div class="w-24 h-24 bg-gradient-to-br from-brand-100 to-brand-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-12 h-12 text-brand-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.369 4.369 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Aún no hay Podcasts</h3>
+                    <p class="text-gray-600">Los podcasts aparecerán aquí una vez que se agreguen. ¡Vuelve pronto para contenido increíble!</p>
+                </div>
+            </div>
         {% endif %}
     </div>
+
+    <!-- Footer spacing -->
+    <div class="h-20"></div>
 </body>
 </html>

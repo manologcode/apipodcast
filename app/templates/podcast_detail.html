@@ -6,39 +6,180 @@
     <title>{{ podcast.title }} - Capítulos</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Optional: Add some custom styles if needed */
-    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
 </head>
-<body class="bg-gray-100 font-sans leading-normal tracking-normal">
-    <div class="container mx-auto p-4">
-        <div class="flex items-center mb-6">
-            <h1 class="text-3xl font-bold text-gray-800">{{ podcast.title }}</h1>
+<body class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <!-- Header with gradient background -->
+    <div class="gradient-bg">
+        <div class="container mx-auto px-4 py-16">
+            <div class="text-center text-white">
+                <h1 class="text-5xl md:text-6xl font-bold mb-4 tracking-tight">{{ podcast.title }}</h1>
+                <div class="w-24 h-1 bg-white/30 mx-auto rounded-full"></div>
+            </div>
         </div>
+    </div>
+
+    <div class="container mx-auto px-4 -mt-8 relative z-10">
+        <!-- Podcast Info Card with Glass Effect -->
+        <div class="glass-effect rounded-3xl shadow-2xl overflow-hidden mb-12 border border-white/20">
+            <div class="md:flex">
+                {% if podcast.image_url %}
+                    <div class="md:flex-shrink-0 relative">
+                        <img src="{{ url_for('static', path=podcast.image_url) }}" 
+                             alt="{{ podcast.title }} Cover" 
+                             class="w-full md:w-72 h-64 md:h-auto object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                    </div>
+                {% else %}
+                    <div class="md:flex-shrink-0 w-full md:w-72 h-64 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                        <div class="text-center text-gray-500">
+                            <svg class="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-sm font-medium">Sin Imagen</span>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <div class="p-8 flex flex-col justify-between leading-relaxed backdrop-blur-sm">
+                    <div class="mb-6">
+                        <p class="text-gray-700 text-lg leading-relaxed mb-6">{{ podcast.description | safe }}</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-brand-100 rounded-full flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-brand-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <span class="text-gray-600 font-medium">{{ podcast.author }}</span>
+                            </div>
+                            
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-brand-100 rounded-full flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-brand-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M7 2a1 1 0 011 1v1h3a1 1 0 110 2H9.578a.697.697 0 01-.013.041L9.02 6.8l1.01.606a1 1 0 01.42 1.319l-1.01 1.718a1 1 0 01-1.319.42L7 10.4l-1.121.663a1 1 0 01-1.319-.42L3.55 8.725a1 1 0 01.42-1.319L5 6.8l-.545-.759A.697.697 0 014.422 6H2a1 1 0 110-2h3V3a1 1 0 011-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <span class="text-gray-600 font-medium">{{ podcast.language }}</span>
+                            </div>
+                            
+                            {% if podcast.category %}
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-brand-100 rounded-full flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-brand-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/>
+                                    </svg>
+                                </div>
+                                <span class="text-gray-600 font-medium">{{ podcast.category }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-3">
+                        <a href="{{ url_for('get_podcast_feed', feed_url_slug=podcast.feed_url_slug) }}" 
+                           class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M3.429 4.286A1 1 0 014.286 3h11.428a1 1 0 01.857 1.286l-1.714 10.285a1 1 0 01-.857.715H6a1 1 0 01-.857-.715L3.429 4.286z"/>
+                            </svg>
+                            Feed RSS
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Episodes Section -->
         {% if episodes %}
-            <div class="space-y-4">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Episodios</h2>
+                <p class="text-gray-600 mb-8">Descubre todos los episodios disponibles</p>
+            </div>
+
+            <div class="space-y-6">
                 {% for episode in episodes %}
                     <a href="{{ url_for('read_episode_detail', episode_id=episode.id) }}" class="block">
-                        <div class="bg-white rounded-lg shadow-md p-6">
-                            <h3 class="text-xl font-semibold mb-2 text-gray-800">{{ episode.title }}</h3>
-                            <p class="text-gray-600 text-sm mb-4">{{ episode.description | truncate(700) | safe }}</p>
-                            {% if episode.duration %}
-                                <p class="text-gray-700 text-sm mb-2">Duration: {{ episode.duration }} - <small>{{ episode.id }}</small></p>
-                            {% endif %}
-                            <p class="text-gray-700 text-sm mb-4">Published: {{ episode.pub_date.strftime('%Y-%m-%d %H:%M') }}</p>
-                            {% if episode.audio_url %}
-                                <audio controls class="w-full">
-                                    <source src="{{ url_for('static', path=episode.audio_url) }}" type="{{ episode.audio_type }}">
-                                    Your browser does not support the audio element.
-                                </audio>
-                            {% endif %}
+                        <div class="podcast-card bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6 hover:shadow-2xl">
+                            <div class="flex items-start space-x-4">
+                                <div class="episode-number flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold shadow-md">
+                                    {{ loop.index }}
+                                </div>
+
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="text-xl font-bold mb-3 text-gray-800 leading-tight">{{ episode.title }}</h3>
+
+                                    <p class="text-gray-600 mb-4 leading-relaxed">{{ episode.description | truncate(700) | safe }}</p>
+
+                                    <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-4">
+                                        {% if episode.duration %}
+                                            <div class="flex items-center space-x-1">
+                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                                                </svg>
+                                                <span>{{ episode.duration }}</span>
+                                            </div>
+                                        {% endif %}
+
+                                        <div class="flex items-center space-x-1">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span>{{ episode.pub_date.strftime('%B %d, %Y') }}</span>
+                                        </div>
+
+                                        <div class="text-xs px-2 py-1 bg-gray-100 rounded-full">
+                                            ID: {{ episode.id }}
+                                        </div>
+                                    </div>
+
+                                    {% if episode.audio_url %}
+                                        <div class="audio-player">
+                                            <audio controls class="w-full" preload="none">
+                                                <source src="{{ url_for('static', path=episode.audio_url) }}" type="{{ episode.audio_type }}">
+                                                Tu navegador no soporta el elemento de audio.
+                                            </audio>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                     </a>
                 {% endfor %}
             </div>
         {% else %}
-            <p class="text-gray-600">No episodes available for this podcast yet.</p>
+            <div class="text-center py-16">
+                <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Aún no hay Episodios</h3>
+                <p class="text-gray-600">No hay episodios disponibles para este podcast en este momento. ¡Vuelve más tarde!</p>
+            </div>
         {% endif %}
     </div>
+
+    <!-- Footer spacing -->
+    <div class="h-16"></div>
 </body>
 </html>

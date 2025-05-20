@@ -12,5 +12,7 @@ services:
         - ./app:/app
         - ./data:/app/data
     environment:
-      - API_TOKEN=your_super_secret_token # <-- REPLACE WITH A STRONG, UNIQUE TOKEN
+      - API_TOKEN=your_super_secret_token 
       - BASE_URL=http://192.168.1.69:5002
+      - TITLE_PODCAST=Podcasts de Manolo Gomez
+      - SUBTITLE_PODCAST=Mis ideas y experimentos convertidos en voz 

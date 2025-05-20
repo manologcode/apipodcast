@@ -1,0 +1,71 @@
+.glass-effect {
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.podcast-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.podcast-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+.gradient-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.image-overlay {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%);
+}
+
+.pulse-animation {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: -468px 0; }
+    100% { background-position: 468px 0; }
+}
+
+.shimmer {
+    animation: shimmer 2s infinite;
+    background: linear-gradient(to right, #eff6ff 4%, #dbeafe 25%, #eff6ff 36%);
+    background-size: 1000px 100%;
+}
+
+.episode-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.episode-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.audio-player {
+    background: linear-gradient(145deg, #f8fafc, #e2e8f0);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.back-button {
+    transition: all 0.3s ease;
+}
+
+.back-button:hover {
+    transform: translateX(-4px);
+}
+
+.episode-number {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+}
