@@ -36,7 +36,12 @@ class EpisodeUpdate(EpisodeBase):
     pub_date: Optional[datetime] = None
     guid: Optional[str] = None
 
-class PodcastUpdate(PodcastBase):
+class PodcastUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    author: Optional[str] = None
+    language: Optional[str] = None
+    category: Optional[str] = None
     image_url: Optional[str] = None
     feed_url_slug: Optional[str] = None # Podría actualizarse, pero con cuidado si ya se ha distribuido el feed
 
@@ -59,6 +64,14 @@ class Podcast(PodcastBase):
     image_url: Optional[str]
     feed_url_slug: str
     episodes: List[Episode] = [] # Incluir una lista de episodios en la respuesta del podcast
+
+    class Config:
+        orm_mode = True
+
+# Nuevo esquema para respuesta simplificada de Podcast
+class PodcastSimple(BaseModel):
+    id: int
+    title: str
 
     class Config:
         orm_mode = True

@@ -157,7 +157,7 @@ async def create_podcast(
 
     return crud.create_podcast(db=db, podcast=podcast_create_schema, image_url=image_relative_path)
 
-@app.get("/podcasts/", response_model=List[schemas.Podcast])
+@app.get("/podcasts/", response_model=List[schemas.PodcastSimple])
 def read_podcasts(skip: int = 0, limit: int = 100, db: Session = Depends(database.get_db)):
     podcasts = crud.get_podcasts(db, skip=skip, limit=limit)
     return podcasts
@@ -169,29 +169,38 @@ def read_podcast(podcast_id: int, db: Session = Depends(database.get_db)):
         raise HTTPException(status_code=404, detail="Podcast not found")
     return db_podcast
 
-@app.put("/podcasts/{podcast_id}", response_model=schemas.Podcast, dependencies=[Depends(verify_token)]) # Apply security dependency
-async def update_podcast(
+@app.put("/podcasts/{podcast_id}", response_model=schemas.Podcast, dependencies=[Depends(verify_token)]) # Endpoint to update text fields
+def update_podcast_text(
     podcast_id: int,
-    db: Session = Depends(database.get_db),
-    title: Optional[str] = Form(None),
-    description: Optional[str] = Form(None),
-    author: Optional[str] = Form(None),
-    language: Optional[str] = Form(None),
-    category: Optional[str] = Form(None),
-    feed_url_slug: Optional[str] = Form(None), # Considerar si permitir actualizar el slug
-    image_file: Optional[UploadFile] = File(None)
+    podcast_update: schemas.PodcastUpdate, # Accept JSON body for text fields
+    db: Session = Depends(database.get_db)
 ):
     db_podcast = crud.get_podcast(db, podcast_id=podcast_id)
     if db_podcast is None:
         raise HTTPException(status_code=404, detail="Podcast not found")
 
     # Verificar si el nuevo slug ya existe y no es el del podcast actual
-    if feed_url_slug is not None and feed_url_slug != db_podcast.feed_url_slug:
-         db_podcast_slug = crud.get_podcast_by_slug(db, slug=feed_url_slug)
+    if podcast_update.feed_url_slug is not None and podcast_update.feed_url_slug != db_podcast.feed_url_slug:
+         db_podcast_slug = crud.get_podcast_by_slug(db, slug=podcast_update.feed_url_slug)
          if db_podcast_slug:
               raise HTTPException(status_code=400, detail="Podcast with this feed slug already exists")
 
+    # Pass the podcast_update schema directly to crud.update_podcast
+    # Note: image_url will be None here, as this endpoint only handles text
+    return crud.update_podcast(db=db, podcast_id=podcast_id, podcast=podcast_update, image_url=None)
 
+
+@app.put("/podcasts/{podcast_id}/image", response_model=schemas.Podcast, dependencies=[Depends(verify_token)]) # Endpoint to update image file
+async def update_podcast_image(
+    podcast_id: int,
+    db: Session = Depends(database.get_db),
+    image_file: UploadFile = File(...) # Require image file for this endpoint
+):
+    db_podcast = crud.get_podcast(db, podcast_id=podcast_id)
+    if db_podcast is None:
+        raise HTTPException(status_code=404, detail="Podcast not found")
+
+    # Handle image file upload
     image_relative_path = None
     if image_file:
         # Opcional: Eliminar la imagen antigua si existe
@@ -199,21 +208,11 @@ async def update_podcast(
             os.remove(STATIC_DIR / db_podcast.image_url)
         image_relative_path = await save_upload_file(image_file, FILES_DIR)
 
-    # Crear un schema de actualización solo con los campos proporcionados
-    update_data = {
-        "title": title,
-        "description": description,
-        "author": author,
-        "language": language,
-        "category": category,
-        "feed_url_slug": feed_url_slug
-    }
-    # Filtrar Nones y campos no configurados explícitamente
-    update_schema_data = {k: v for k, v in update_data.items() if v is not None}
+    # Create an empty PodcastUpdate schema as this endpoint only updates the image
+    empty_podcast_update = schemas.PodcastUpdate()
 
-    podcast_update_schema = schemas.PodcastUpdate(**update_schema_data)
-
-    return crud.update_podcast(db=db, podcast_id=podcast_id, podcast=podcast_update_schema, image_url=image_relative_path)
+    # Pass the image_url to crud.update_podcast. Text fields will be None from the empty schema.
+    return crud.update_podcast(db=db, podcast_id=podcast_id, podcast=empty_podcast_update, image_url=image_relative_path)
 
 
 @app.delete("/podcasts/{podcast_id}", dependencies=[Depends(verify_token)]) # Apply security dependency
@@ -242,7 +241,8 @@ async def create_episode_for_podcast(
     title: str = Form(...),
     description: str = Form(...),
     duration: Optional[str] = Form(None), # Duración en formato HH:MM:SS
-    audio_file: UploadFile = File(...)
+    audio_file: UploadFile = File(...),
+    image_file: Optional[UploadFile] = File(None) # Add image file parameter
 ):
     db_podcast = crud.get_podcast(db, podcast_id=podcast_id)
     if db_podcast is None:
@@ -261,6 +261,11 @@ async def create_episode_for_podcast(
        full_path = STATIC_DIR / audio_relative_path
        duration_str = duration_mp3(full_path)
 
+    # Guardar la imagen subida si existe
+    image_relative_path = None
+    if image_file:
+        image_relative_path = await save_upload_file(image_file, FILES_DIR)
+
     episode_create_schema = schemas.EpisodeCreate(
         title=title,
         description=description,
@@ -274,7 +279,8 @@ async def create_episode_for_podcast(
         audio_url=audio_relative_path,
         audio_length=audio_length,
         audio_type=audio_type,
-        duration=duration_str 
+        duration=duration_str,
+        image_url=image_relative_path # Pass the image URL to crud function
     )
 
 @app.get("/podcasts/{podcast_id}/episodes/", response_model=List[schemas.Episode])

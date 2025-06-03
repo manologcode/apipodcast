@@ -121,8 +121,17 @@
                     <a href="{{ url_for('read_episode_detail', episode_id=episode.id) }}" class="block">
                         <div class="podcast-card bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6 hover:shadow-2xl">
                             <div class="flex items-start space-x-4">
-                                <div class="episode-number flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold shadow-md">
-                                    {{ loop.index }}
+                                <div class="flex flex-col items-center justify-center space-y-6">
+                                    <div class="episode-number flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold shadow-md">
+                                        {{ loop.index }}
+                                    </div>
+                                    {% if episode.image_url %}
+                                        <div class="flex-shrink-0">
+                                            <img src="{{ url_for('static', path=episode.image_url) }}" 
+                                                 alt="{{ episode.title }} Cover" 
+                                                 class="w-24 h-24 object-cover rounded-lg shadow-md">
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <div class="flex-1 min-w-0">
@@ -145,10 +154,6 @@
                                                 <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
                                             </svg>
                                             <span>{{ episode.pub_date.strftime('%B %d, %Y') }}</span>
-                                        </div>
-
-                                        <div class="text-xs px-2 py-1 bg-gray-100 rounded-full">
-                                            ID: {{ episode.id }}
                                         </div>
                                     </div>
 

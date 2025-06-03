@@ -66,6 +66,11 @@ def generate_rss_feed(podcast: models.Podcast, episodes: List[models.Episode], b
         if episode.duration:
             ET.SubElement(item, "{http://www.itunes.com/dtds/podcast-1.0.dtd}duration").text = episode.duration
 
+        # Add episode image if available
+        if episode.image_url:
+            full_episode_image_url = f"{base_url}/static/{episode.image_url}"
+            ET.SubElement(item, "{http://www.itunes.com/dtds/podcast-1.0.dtd}image", attrib={"href": full_episode_image_url})
+
         # (opcional) contenido enriquecido con HTML
         # content_encoded = ET.SubElement(item, "{http://purl.org/rss/1.0/modules/content/}encoded")
         # content_encoded.text = f"<![CDATA[{episode.description}]]>"

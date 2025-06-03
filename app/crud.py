@@ -69,7 +69,8 @@ def create_episode(
     audio_url: str, # Ruta del archivo de audio
     audio_length: int, # Tamaño del archivo
     audio_type: str, # Tipo MIME
-    duration: Optional[str] = None # Duración opcional
+    duration: Optional[str] = None, # Duración opcional
+    image_url: Optional[str] = None # Add image_url parameter
 ):
     # Generar un GUID único para el episodio
     guid = str(uuid.uuid4())
@@ -82,7 +83,8 @@ def create_episode(
         audio_type=audio_type,
         duration=duration,
         pub_date=datetime.utcnow(), # Usar la fecha actual como fecha de publicación
-        guid=guid
+        guid=guid,
+        image_url=image_url # Save the image URL
     )
     db.add(db_episode)
     db.commit()

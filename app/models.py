@@ -31,6 +31,7 @@ class Episode(Base):
     audio_type = Column(String) # Tipo MIME del archivo (e.g., "audio/mpeg")
     duration = Column(String, nullable=True) # Duración del episodio (e.g., "HH:MM:SS")
     pub_date = Column(DateTime, default=datetime.utcnow) # Fecha de publicación
+    image_url = Column(String, nullable=True) # Ruta local o URL de la imagen
     guid = Column(String, unique=True, index=True) # Identificador único para el episodio
 
     podcast = relationship("Podcast", back_populates="episodes")
