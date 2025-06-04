@@ -316,52 +316,63 @@ def read_episode_detail(episode_id: int, request: Request, db: Session = Depends
 @app.put("/episodes/{episode_id}", response_model=schemas.Episode, dependencies=[Depends(verify_token)]) # Apply security dependency
 async def update_episode(
     episode_id: int,
-    db: Session = Depends(database.get_db),
-    title: Optional[str] = Form(None),
-    description: Optional[str] = Form(None),
-    duration: Optional[str] = Form(None),
-    audio_file: Optional[UploadFile] = File(None)
+    episode_update: schemas.EpisodeUpdate, # Accept EpisodeUpdate schema in the request body
+    db: Session = Depends(database.get_db)
 ):
     db_episode = crud.get_episode(db, episode_id=episode_id)
     if db_episode is None:
         raise HTTPException(status_code=404, detail="Episode not found")
 
+    return crud.update_episode(
+        db=db,
+        episode_id=episode_id,
+        episode=episode_update, # Pass the received schema directly
+        audio_url=None, # Audio file is not updated via this endpoint
+        audio_length=None,
+        audio_type=None
+    )
+
+# Add a new endpoint for updating the audio file separately
+@app.put("/episodes/{episode_id}/audio", response_model=schemas.Episode, dependencies=[Depends(verify_token)])
+async def update_episode_audio(
+    episode_id: int,
+    db: Session = Depends(database.get_db),
+    audio_file: UploadFile = File(...) # Require audio file for this endpoint
+):
+    db_episode = crud.get_episode(db, episode_id=episode_id)
+    if db_episode is None:
+        raise HTTPException(status_code=404, detail="Episode not found")
+
+    # Handle audio file upload
     audio_relative_path = None
     audio_length = None
     audio_type = None
+    duration_str = None
 
     if audio_file:
-        # Opcional: Eliminar el archivo de audio antiguo si existe
+        # Optional: Delete the old audio file if it exists
         if db_episode.audio_url and (STATIC_DIR / db_episode.audio_url).exists():
             os.remove(STATIC_DIR / db_episode.audio_url)
 
         audio_relative_path = await save_upload_file(audio_file, FILES_DIR)
         audio_length = get_file_size(audio_relative_path)
         audio_type = get_mime_type(audio_relative_path)
-        # Recalcular duración si se sube un nuevo archivo y no se proporciona duración explícitamente
-        # if duration is None:
-        #     # Lógica para calcular duración del nuevo archivo
-        #     pass
+        # Recalculate duration if a new file is uploaded
+        full_path = STATIC_DIR / audio_relative_path
+        duration_str = duration_mp3(full_path)
 
+    # Create an empty EpisodeUpdate schema as this endpoint only updates the audio
+    empty_episode_update = schemas.EpisodeUpdate()
 
-    # Crear un schema de actualización solo con los campos proporcionados
-    update_data = {
-        "title": title,
-        "description": description,
-        "duration": duration,
-        # guid y pub_date no se actualizan comúnmente, pero podrías añadirlos si necesitas
-    }
-    update_schema_data = {k: v for k, v in update_data.items() if v is not None}
-
-    episode_update_schema = schemas.EpisodeUpdate(**update_schema_data)
-
+    # Pass the audio details to crud.update_episode. Text fields will be None from the empty schema.
     return crud.update_episode(
         db=db,
         episode_id=episode_id,
-        episode=episode_update_schema,
+        episode=empty_episode_update,
         audio_url=audio_relative_path,
         audio_length=audio_length,
-        audio_type=audio_type
+        audio_type=audio_type,
+        duration=duration_str # Pass the calculated duration
     )
 
 @app.delete("/episodes/{episode_id}", dependencies=[Depends(verify_token)]) # Apply security dependency

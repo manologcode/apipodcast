@@ -29,6 +29,9 @@ class PodcastCreate(PodcastBase):
 
 # Esquemas para Actualización
 class EpisodeUpdate(EpisodeBase):
+
+    title: Optional[str] = None
+    description: Optional[str] = None
     audio_url: Optional[str] = None
     audio_length: Optional[int] = None
     audio_type: Optional[str] = None
