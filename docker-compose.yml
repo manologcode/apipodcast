@@ -5,7 +5,9 @@ services:
     restart: always
     container_name: apipodcast
     # command: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]
+    # command:  ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "-w", "4", "-b", "0.0.0.0:5080", "app:app", "--limit-request-line", "4094", "--limit-request-field_size", "8190", "--timeout", "30", "--worker-tmp-dir", "/dev/shm", "--forwarded-allow-ips", "*", "--access-logfile", "-"]
     command: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000"]
+
     ports:
         - "5002:5000"
     volumes:
